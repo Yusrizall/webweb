@@ -5,6 +5,8 @@ namespace App\Http\Livewire;
 use App\Models\Cart;
 use App\Models\Product;
 use App\Models\Transaction;
+use App\Models\TransactionDetail;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
 class Cashier extends Component
@@ -17,7 +19,10 @@ class Cashier extends Component
         $payment,
         $change;
 
-    protected $listeners = ['calculate' => 'calculate'];
+    protected $rules = [
+        'customerName' => 'required',
+        'payment' => 'required',
+    ];
 
     public function saveCart(Product $product)
     {
@@ -59,12 +64,10 @@ class Cashier extends Component
         }
     }
 
-    public function calculate()
-    {
-    }
-
     public function checkout()
     {
+        DB::beginTransaction();
+
         $transaction = new Transaction();
 
         $transaction->customer_name = $this->customerName;
@@ -73,12 +76,27 @@ class Cashier extends Component
 
         $transaction->save();
 
+        $cart = Cart::all();
+
+        foreach ($cart as $item) {
+            TransactionDetail::query()->create([
+                'transaction_id' => $transaction->id,
+                'product_id' => $item->product_id,
+                'quantity' => $item->quantity,
+                'price' => $item->price,
+            ]);
+        }
+
         Cart::query()->delete();
 
         $this->customerName = null;
         $this->payment = null;
         $this->change = null;
         $this->tempCart = null;
+
+        DB::commit();
+
+        return redirect('/checkout/' . $transaction->id);
     }
 
     public function mount()
@@ -96,8 +114,6 @@ class Cashier extends Component
             $this->tempCart[$cart->product_id] = $this->tempCart[$cart->product_id] ?? $cart->quantity;
             $this->total += $cart->quantity * $cart->price;
         }
-
-        // dd($this->tempCart);
 
         if ($this->payment > $this->total)
             $this->change = $this->payment - $this->total;

@@ -18,7 +18,7 @@
                             @foreach ($products as $product)
                             <tr>
                                 <td>{{ $product->name }}</td>
-                                <td>{{ $product->price }}</td>
+                                <td>{{ number_format($product->price) }}</td>
                                 <td>{{ $product->quantity }}</td>
                                 <td>
                                     <input class="form-control" type="number" min="0" max="{{ $product->quantity + (isset($tempCart[$product->id]) && $tempCart[$product->id] ? $tempCart[$product->id] : 0) }}" wire:model="tempCart.{{ $product->id }}" wire:change="saveCart({{ $product }})">
@@ -49,15 +49,15 @@
                             <tr>
                                 <td>{{ $item->product->name }}</td>
                                 <td>{{ $item->quantity }}</td>
-                                <td>{{ $item->price }}</td>
-                                <td>{{ $item->quantity * $item->price }}</td>
+                                <td>{{ number_format($item->price) }}</td>
+                                <td>{{ number_format($item->quantity * $item->price) }}</td>
                             </tr>
                             @endforeach
                         </tbody>
                         <tfoot>
                             <tr>
                                 <th class="h4 text-right" colspan="3">Total Pembelian :</th>
-                                <th class="h4">{{ $total }}</th>
+                                <th class="h4">{{ number_format($total) }}</th>
                             </tr>
                         </tfoot>
                     </table>
@@ -76,13 +76,13 @@
                                 <div class="form-group row">
                                     <label class="col-sm-4 m-auto">Pembayaran</label>
                                     <div class="col-sm-8">
-                                        <input class="form-control" type="text" wire:model="payment" wire:input="$emit('calculate')" required>
+                                        <input class="form-control" type="text" wire:model="payment" required>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <h4 class="text-right">
-                            Kembalian : {{ $payment >= $total ? $change : 'Pembayaran Kurang' }}
+                            Kembalian : {{ $payment >= $total ? number_format($change) : 'Pembayaran Kurang' }}
                         </h4>
                         <hr>
                         <div class="d-flex">
