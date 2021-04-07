@@ -7,6 +7,7 @@ use App\Models\Product;
 use App\Models\Transaction;
 use App\Models\TransactionDetail;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 use Livewire\Component;
 
 class Cashier extends Component
@@ -19,18 +20,15 @@ class Cashier extends Component
         $payment,
         $change;
 
-    protected $rules = [
-        'customerName' => 'required',
-        'payment' => 'required',
-    ];
-
     public function saveCart(Product $product)
     {
         $cart = Cart::query()->where('product_id', $product->id)->first();
 
-        $quantity = $this->tempCart[$product->id];
+        $quantity = &$this->tempCart[$product->id];
 
         if ($cart) {
+            if ($quantity === "") $quantity = 0;
+
             if (($product->quantity + $cart->quantity) - $quantity < 0) {
                 $this->tempCart[$product->id] = ($product->quantity + $cart->quantity);
                 return;
@@ -64,8 +62,36 @@ class Cashier extends Component
         }
     }
 
+    public function validateCheckout()
+    {
+        $this->payment = (float) $this->payment;
+
+        $this->validate(
+            ['customerName' => 'required', 'payment' => 'required|numeric|min:' . $this->total],
+            [
+                'customerName.required' => 'Tolong isi nama customer sebelum checkout',
+                'payment.required' => 'Tolong isi nominal pembayaran sebelum checkout',
+                'payment.numeric' => 'Nominal pembayaran yang dimasukkan harus berupa angka',
+                'payment.min' => 'Nominal pembayaran yang dimasukkan kurang dari total pembelian',
+            ]
+        );
+    }
+
+    public function reduceProductStock(Product $product, $quantity)
+    {
+        if ($quantity > $product->quantity) {
+            return false;
+        }
+
+        $product->quantity -= $quantity;
+
+        $product->save();
+    }
+
     public function checkout()
     {
+        $this->validateCheckout();
+
         DB::beginTransaction();
 
         $transaction = new Transaction();
@@ -78,16 +104,21 @@ class Cashier extends Component
 
         $cart = Cart::all();
 
+        Cart::query()->delete();
+
         foreach ($cart as $item) {
-            TransactionDetail::query()->create([
+            $transactionDetail = TransactionDetail::query()->create([
                 'transaction_id' => $transaction->id,
                 'product_id' => $item->product_id,
                 'quantity' => $item->quantity,
                 'price' => $item->price,
             ]);
-        }
 
-        Cart::query()->delete();
+            $this->reduceProductStock(
+                Product::query()->find($transactionDetail->product_id),
+                $transactionDetail->quantity
+            );
+        }
 
         $this->customerName = null;
         $this->payment = null;
@@ -99,21 +130,41 @@ class Cashier extends Component
         return redirect('/checkout/' . $transaction->id);
     }
 
+    /**
+     * Dijalankan pertama kali dan hanya satu kali
+     *
+     * @return void
+     */
     public function mount()
     {
         $this->change = 0;
     }
 
+    /**
+     * Dijalankan setiap ada perubahan data
+     *
+     * @return void
+     */
     public function render()
     {
-        $this->products = Product::all();
         $this->cart = Cart::with('product')->get();
         $this->total = 0;
 
+        $productsInCart = [];
+
+        /**
+         * Menambah total pembelian
+         */
         foreach ($this->cart as $cart) {
             $this->tempCart[$cart->product_id] = $this->tempCart[$cart->product_id] ?? $cart->quantity;
+
+            if (isset($this->tempCart[$cart->product_id]) && $this->tempCart[$cart->product_id] > 0)
+                $productsInCart[] = $cart->product_id;
+
             $this->total += $cart->quantity * $cart->price;
         }
+
+        $this->products = Product::query()->whereIn('id', $productsInCart)->orWhere('quantity', '>', 0)->get();
 
         if ($this->payment > $this->total)
             $this->change = $this->payment - $this->total;

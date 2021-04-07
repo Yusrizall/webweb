@@ -7,10 +7,15 @@ use Illuminate\Http\Request;
 
 class CheckoutController extends Controller
 {
-    public function index(Transaction $transaction)
+    public function index()
     {
-        // dd($transaction->details[0]->product);
+        $transactions = Transaction::all();
 
-        return view('checkout', ['transaction' => $transaction]);
+        return view('checkout.index', ['transactions' => $transactions]);
+    }
+
+    public function show(Transaction $transaction)
+    {
+        return view('checkout.show', ['transaction' => $transaction]);
     }
 }

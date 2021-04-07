@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
@@ -17,5 +19,9 @@ use Illuminate\Support\Facades\Auth;
 
 Auth::routes();
 
-Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->middleware('auth')->name('home');
-Route::get('/checkout/{transaction}', [CheckoutController::class, 'index']);
+Route::middleware('auth')->group(function () {
+    Route::get('/', [HomeController::class, 'index']);
+    Route::resource('/products', ProductController::class)->except(['show']);
+    Route::get('/checkout', [CheckoutController::class, 'index']);
+    Route::get('/checkout/{transaction}', [CheckoutController::class, 'show']);
+});
