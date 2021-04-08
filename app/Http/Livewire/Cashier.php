@@ -166,6 +166,8 @@ class Cashier extends Component
 
         $this->products = Product::query()->whereIn('id', $productsInCart)->orWhere('quantity', '>', 0)->get();
 
+        $this->payment = preg_replace('/[^0-9]/', '', $this->payment);
+
         if ($this->payment > $this->total)
             $this->change = $this->payment - $this->total;
         else
