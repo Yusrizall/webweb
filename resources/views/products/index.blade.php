@@ -10,6 +10,9 @@
                 <a class="btn btn-primary ml-auto" href="/products/create">Tambah</a>
             </div>
             <hr>
+            @if (session('errorMessage'))
+            <span class="text-danger">{{ session('errorMessage') }}</span>
+            @endif
             <table class="table table-bordered mb-0">
                 <thead>
                     <tr>

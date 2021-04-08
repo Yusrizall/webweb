@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\Transaction;
+use App\Models\TransactionDetail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -87,6 +89,9 @@ class ProductController extends Controller
 
     public function destroy(Product $product)
     {
+        if (TransactionDetail::query()->where('product_id', $product->id)->first())
+            return redirect('/products')->with('errorMessage', 'Produk tidak dapat dihapus karena sudah digunakan untuk transaksi');
+
         $product->delete();
 
         return redirect('/products');
