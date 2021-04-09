@@ -15,22 +15,24 @@ class ProductSeeder extends Seeder
     public function run()
     {
         Product::query()->create([
-            'name' => 'Sepatu A',
+            'name' => 'Sepatu Merah',
             'price' => 1000000,
-            'quantity' => 3,
+            'quantity' => 10,
             'image_url' => 'products/a.jpg',
         ]);
+
         Product::query()->create([
-            'name' => 'Sepatu B',
-            'price' => 500000,
-            'quantity' => 5,
-            'image_url' => 'products/b.jpg',
+            'name' => 'Celana Pendek Jingga',
+            'price' => 30000,
+            'quantity' => 40,
+            'image_url' =>  'products/b.jpg',
         ]);
+
         Product::query()->create([
-            'name' => 'Sepatu C',
-            'price' => 300000,
-            'quantity' => 10,
-            'image_url' =>  'products/c.jpg',
+            'name' => 'Kaos Hitam',
+            'price' => 50000,
+            'quantity' => 50,
+            'image_url' => 'products/c.jpg',
         ]);
     }
 }

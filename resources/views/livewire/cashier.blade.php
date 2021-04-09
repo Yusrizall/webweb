@@ -1,9 +1,6 @@
 <div class="container-fluid">
-    <div class="d-flex">
-        <a class="btn btn-primary ml-auto mb-2" href="/checkout">Riwayat Transaksi</a>
-    </div>
     <div class="row">
-        <div class="col-5 pr-2">
+        <div class="col-6 pr-2">
             <div class="card">
                 <div class="card-body">
                     <div class="d-flex">
@@ -12,16 +9,17 @@
                     </div>
                     <hr>
                     <table class="table table-bordered m-0">
-                        <thead>
+                        <thead class="thead-light">
                             <tr>
                                 <th>Gambar</th>
                                 <th>Nama</th>
                                 <th>Harga</th>
                                 <th>Stok</th>
-                                <th>Jumlah Pembelian</th>
+                                <th class="fit">Jumlah Pembelian</th>
                             </tr>
                         </thead>
                         <tbody>
+                            @if (count($products) > 0)
                             @foreach ($products as $product)
                             <tr>
                                 <td class="fit">
@@ -39,18 +37,26 @@
                                 </td>
                             </tr>
                             @endforeach
+                            @else
+                            <tr>
+                                <td class="text-center" colspan="5">Tidak ada produk yang siap dijual</td>
+                            </tr>
+                            @endif
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
-        <div class="col-7 pl-1">
+        <div class="col-6 pl-1">
             <div class="card">
                 <div class="card-body">
-                    <h5>Keranjang</h5>
+                    <div class="d-flex">
+                        <h5 class="my-auto">Keranjang</h5>
+                        <button class="btn btn-danger ml-auto" wire:click="clearCart()">Kosongi Keranjang</button>
+                    </div>
                     <hr>
                     <table class="table table-bordered m-0">
-                        <thead>
+                        <thead class="thead-light">
                             <tr>
                                 <th>Nama</th>
                                 <th>Kuantitas</th>
@@ -59,6 +65,7 @@
                             </tr>
                         </thead>
                         <tbody>
+                            @if (count($cart) > 0)
                             @foreach ($cart as $item)
                             <tr>
                                 <td>{{ $item->product->name }}</td>
@@ -67,6 +74,11 @@
                                 <td class="text-right">{{ number_format($item->quantity * $item->price) }}</td>
                             </tr>
                             @endforeach
+                            @else
+                            <tr>
+                                <td class="text-center" colspan="4">Keranjang Kosong</td>
+                            </tr>
+                            @endif
                         </tbody>
                         <tfoot>
                             <tr>
@@ -78,7 +90,7 @@
                     <hr>
                     <form wire:submit.prevent="checkout">
                         <div class="row">
-                            <div class="col-sm-6">
+                            <div class="col-sm-12">
                                 <div class="form-group row">
                                     <label class="col-sm-4 m-auto">Nama Pembeli</label>
                                     <div class="col-sm-8">
@@ -87,7 +99,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-sm-6">
+                            <div class="col-sm-12">
                                 <div class="form-group row">
                                     <label class="col-sm-4 m-auto">Pembayaran</label>
                                     <div class="col-sm-8">

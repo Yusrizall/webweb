@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
+<div class="container-fluid">
     <a class="btn btn-primary mb-2" href="/">Kembali</a>
     <div class="card">
         <div class="card-body">
@@ -24,6 +24,7 @@
                     </tr>
                 </thead>
                 <tbody>
+                    @if (count($products) > 0)
                     @foreach ($products as $product)
                     <tr>
                         <td>{{ $product->name }}</td>
@@ -46,6 +47,11 @@
                         </td>
                     </tr>
                     @endforeach
+                    @else
+                    <tr>
+                        <td class="text-center" colspan="5">Tidak ada produk</td>
+                    </tr>
+                    @endif
                 </tbody>
             </table>
         </div>

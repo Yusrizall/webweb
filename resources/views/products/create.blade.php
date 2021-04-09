@@ -5,7 +5,7 @@
     <a class="btn btn-primary mb-2" href="/products">Kembali</a>
     <div class="card">
         <div class="card-body">
-            <h4 class="my-auto">Master Produk</h4>
+            <h4 class="my-auto">Tambah Produk</h4>
             <hr>
             <form method="POST" action="/products" enctype="multipart/form-data">
                 @csrf

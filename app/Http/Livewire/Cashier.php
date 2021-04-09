@@ -62,6 +62,13 @@ class Cashier extends Component
         }
     }
 
+    public function clearCart()
+    {
+        $this->tempCart = [];
+        $this->cart = [];
+        Cart::query()->delete();
+    }
+
     public function validateCheckout()
     {
         $this->payment = (float) $this->payment;

@@ -1,27 +1,27 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
+<div class="container-fluid">
     <a class="btn btn-primary mb-2" href="/checkout">Riwayat Transaksi</a>
     <a class="btn btn-primary mb-2" href="/">Buat Transaksi Baru</a>
     <div class="card">
         <div class="card-body">
             <h4>Pembelian Berhasil</h4>
             <hr>
-            <table class="mb-3">
+            <table class="mb-3 h5">
                 <tr>
                     <th>Nama Customer</th>
-                    <th>:</th>
+                    <th class="text-center" style="min-width: 30px">:</th>
                     <td>{{ $transaction->customer_name }}</td>
                 </tr>
                 <tr>
                     <th>Tanggal Transaksi</th>
-                    <th>:</th>
+                    <th class="text-center" style="min-width: 30px">:</th>
                     <td>{{ $transaction->created_at }}</td>
                 </tr>
             </table>
             <table class="table table-bordered mb-0">
-                <thead>
+                <thead class="thead-light">
                     <tr>
                         <th>Gambar</th>
                         <th>Nama Item</th>
